@@ -5,7 +5,7 @@ public class Point {
     return String.format("(%f,%f)",this.x,this.y);
   }
   public String toSvg() {
-    return String.format("<svg height=\"%f\" width=\"%f\"><circle r=\"100\" cx=\"50\" cy=\"50\" /></svg>");
+    return String.format("<svg height=\"%f\" width=\"%f\"><circle r=\"100\" cx=\"50\" cy=\"50\" /></svg>",this.x,this.y);
   }
   public void translate(double dx, double dy) {
     this.x+=dx;
