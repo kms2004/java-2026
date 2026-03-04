@@ -23,6 +23,6 @@ public class Main {
     scene.addPolygon(pol1);
     scene.addPolygon(pol2);
     scene.addPolygon(pol3);
-    scene.save("../test.html");
+    scene.save("../test.svg");
   }
 }

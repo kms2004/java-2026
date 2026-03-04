@@ -70,7 +70,7 @@ public class SvgScene {
       out += this.polygons[i].moved(-move_x, -move_y).toSvg();
     }
     out = out + "</svg>";
-    out = String.format("<!DOCTYPE html><html><body>%s</body></html>",out);
+    // out = String.format("<!DOCTYPE html><html><body>%s</body></html>",out);
     try {
       FileWriter writer = new FileWriter(filepath);
       writer.write(out);

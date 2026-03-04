@@ -30,7 +30,7 @@ public class Polygon {
     for (int i = 1; i < this.points.length; i++) {
       out = out + " " + this.points[i].getX() + "," + this.points[i].getY();
     }
-    return out + " style=\"fill:lime;stroke:purple;stroke-width:3\" />";
+    return out + "\" style=\"fill:lime;stroke:purple;stroke-width:3\" />";
   }
 
   public BoundingBox boundingBox() {
