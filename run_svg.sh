@@ -1,6 +1,4 @@
 cd svg
-# javac Point.java
-# javac Segment.java
-# javac Polygon.java
-javac Main.java
+javac *.java
 java Main
+cp ../test.svg /shared/

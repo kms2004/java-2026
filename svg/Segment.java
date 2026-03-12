@@ -17,12 +17,29 @@ public class Segment {
     }
     return segments[longest_index];
   }
+
   public String toString() {
-    return String.format("(%s,%s)", this.p1.toString(),this.p2.toString());
+    return String.format("(%s,%s)", this.p1.toString(), this.p2.toString());
   }
-  
-  Segment(Point p1,Point p2) {
-    this.p1=new Point(p1);
-    this.p2=new Point(p2);
+
+  Segment(Point p1, Point p2) {
+    this.p1 = new Point(p1);
+    this.p2 = new Point(p2);
+  }
+
+  public Segment perpendicular() {
+    double midX = (this.p1.getX() + this.p2.getX()) / 2.0;
+    double midY = (this.p1.getY() + this.p2.getY()) / 2.0;
+    double dX = this.p1.getX() - midX;
+    double dY = this.p1.getY() - midY;
+    return new Segment(
+        new Point(midX + dY, midY - dX), new Point(midX - dY, midY + dX));
+  }
+
+  public Point getP1(){
+    return this.p1;
+  }
+  public Point getP2(){
+    return this.p2;
   }
 }

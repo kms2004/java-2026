@@ -1,7 +1,15 @@
-public class Polygon {
+public class Polygon extends Shape {
   private Point[] points;
+  // private Style style;
 
   public Polygon(Point[] points) {
+    // Point[] points2 = points.clone();
+    this(points, new Style());
+  }
+
+  public Polygon(Point[] points, Style style) {
+    super(style);
+    // this.style = style;
     // Point[] points2 = points.clone();
     this.points = new Point[points.length];
     for (int i = 0; i < points.length; i++) {
@@ -11,6 +19,8 @@ public class Polygon {
 
   /// Polygon only has points, thus only points need to be properly copied over.
   public Polygon(Polygon polygon) {
+    super(polygon.style);
+    // this.style=polygon.style;
     this.points = new Point[polygon.points.length];
     for (int i = 0; i < polygon.points.length; i++) {
       this.points[i] = new Point(polygon.points[i]);
@@ -25,14 +35,17 @@ public class Polygon {
     return out;
   }
 
+  @Override
   public String toSvg() {
     String out = String.format("<polygon points=\"%f,%f ", this.points[0].getX(), this.points[0].getY());
     for (int i = 1; i < this.points.length; i++) {
       out = out + " " + this.points[i].getX() + "," + this.points[i].getY();
     }
-    return out + "\" style=\"fill:lime;stroke:purple;stroke-width:3\" />";
+    return String.format("%s \" %s />", out, this.style.toSvg());
+    // return out + "\" style=\"fill:lime;stroke:purple;stroke-width:3\" />";
   }
 
+  @Override
   public BoundingBox boundingBox() {
     // find position of top left corner ()
     // x - -- +
@@ -64,7 +77,7 @@ public class Polygon {
     return new BoundingBox(cx, cy, dx - cx, dy - cy);
   }
 
-  // helper method
+  @Override
   public Polygon moved(double dx, double dy) {
     Polygon n = new Polygon(this);
     for (int i = 0; i < n.points.length; i++) {
@@ -72,4 +85,19 @@ public class Polygon {
     }
     return n;
   }
+
+  @Override
+  public Polygon moved(Point d) {
+    return this.moved(d.getX(), d.getY());
+  }
+
+  public static Polygon square(Segment s1, Style style) {
+    Segment s2 = s1.perpendicular();
+    Point[] points = {
+        s1.getP1(), s2.getP2(), s1.getP2(), s2.getP1()
+    };
+    return new Polygon(
+        points, style);
+  }
+
 }

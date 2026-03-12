@@ -1,25 +1,24 @@
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class SvgScene {
-  private Polygon[] polygons;
-  private int pol_count;
+  private Shape[] shapes;
+  private int shape_count;
 
   public SvgScene() {
-    this.polygons = new Polygon[3];
-    this.pol_count = 0;
+    this.shapes = new Shape[3];
+    this.shape_count = 0;
   }
-  public void addPolygon(Polygon pol) {
-    this.polygons[this.pol_count % 3] = pol;
-    this.pol_count += 1;
+
+  public void addPolygon(Shape shape) {
+    this.shapes[this.shape_count % 3] = shape;
+    this.shape_count += 1;
   }
 
   public String toSvg() {
     String out = "";
-    for (int i = 0; i < java.lang.Math.min(this.pol_count, 3); i++) {
-      out += this.polygons[i].toSvg();
+    for (int i = 0; i < java.lang.Math.min(this.shape_count, 3); i++) {
+      out += this.shapes[i].toSvg();
     }
     return out;
   }
@@ -40,22 +39,22 @@ public class SvgScene {
     width = 0.0;
     height = 0.0;
 
-    if (pol_count != 0) {
-      for (int i = 0; i < java.lang.Math.min(this.pol_count, 3); i++) {
-        BoundingBox temp = this.polygons[i].boundingBox();
+    if (shape_count != 0) {
+      for (int i = 0; i < java.lang.Math.min(this.shape_count, 3); i++) {
+        BoundingBox temp = this.shapes[i].boundingBox();
         if (move_x > temp.x()) {
           move_x = temp.x();
         }
-        System.out.println("y "+temp.y());
+        System.out.println("y " + temp.y());
         if (move_y > temp.y()) {
           move_y = temp.y();
         }
         // cannot define width and height yet, gotta have the actual move vector
       }
-      System.out.println("test "+move_y);
-      for (int i = 0; i < java.lang.Math.min(this.pol_count, 3); i++) {
+      System.out.println("test " + move_y);
+      for (int i = 0; i < java.lang.Math.min(this.shape_count, 3); i++) {
         // check for MOVED values
-        BoundingBox temp = this.polygons[i].boundingBox();
+        BoundingBox temp = this.shapes[i].boundingBox();
         if (width < temp.w() + temp.x() - move_x) {
           width = temp.w() + temp.x() - move_x;
         }
@@ -64,10 +63,11 @@ public class SvgScene {
         }
       }
     }
-    String out = String.format("<svg width=\"%d\" height=\"%d\" xmlns=\"http://www.w3.org/2000/svg\">", (int) width,(int) height);
-    for (int i = 0; i < java.lang.Math.min(this.pol_count, 3); i++) {
+    String out = String.format("<svg width=\"%d\" height=\"%d\" xmlns=\"http://www.w3.org/2000/svg\">", (int) width,
+        (int) height);
+    for (int i = 0; i < java.lang.Math.min(this.shape_count, 3); i++) {
       // defined a helper method
-      out += this.polygons[i].moved(-move_x, -move_y).toSvg();
+      out += this.shapes[i].moved(-move_x, -move_y).toSvg();
     }
     out = out + "</svg>";
     // out = String.format("<!DOCTYPE html><html><body>%s</body></html>",out);

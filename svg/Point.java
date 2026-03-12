@@ -17,10 +17,11 @@ public class Point {
   }
 
   public Point translated(double dx, double dy) {
-    Point p = new Point();
-    p.x = this.x + dx;
-    p.y = this.y + dy;
-    return p;
+    return new Point(this.x + dx, this.y + dy);
+  }
+
+  public Point translated(Point d) {
+    return new Point(this.x + d.x, this.y + d.y);
   }
 
   public double getX() {
@@ -58,4 +59,5 @@ public class Point {
     this.x = -this.x;
     this.y = -this.y;
   }
+
 }
