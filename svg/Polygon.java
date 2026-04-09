@@ -1,4 +1,4 @@
-public class Polygon extends Shape {
+public class Polygon implements Shape {
   private Point[] points;
   // private Style style;
 

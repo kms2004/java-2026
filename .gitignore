@@ -1,3 +1,4 @@
-test.html
-test.svg
+*.svg
 svg/*.class
+svg_decorator/*.class
+genealogy/*.class
