@@ -1,16 +1,25 @@
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-public class Person implements Comparable<Person> {
+public class Person implements Comparable<Person>, Serializable {
   private final String name;
   private final String surname;
   private final LocalDate birthdate;
@@ -56,8 +65,9 @@ public class Person implements Comparable<Person> {
     }
   }
 
-  public static List<Person> fromCsv(String filepath) throws IOException, NegativeLifespanException, AmbiguousPersonException{
-    List<Person> people = new ArrayList<Person>();
+  public static List<Person> fromCsv(String filepath)
+      throws IOException, NegativeLifespanException, AmbiguousPersonException {
+    Map<String, PersonWithParentStrings> people = new HashMap<String, PersonWithParentStrings>();
     BufferedReader file = new BufferedReader(new FileReader(filepath));
     // FileReader f = new FileReader(filepath);
     // read the headers line
@@ -68,29 +78,26 @@ public class Person implements Comparable<Person> {
       // calling static method without class it belongs to while call is within that
       // class... lovely...
       try {
-        Person new_person = fromCsvLine(line);
-        for(Person person: people) {
-          if (person.name.equals(new_person.name)&&person.surname.equals(new_person.surname)) {
-            throw new AmbiguousPersonException(person,new_person);
+        PersonWithParentStrings new_person = PersonWithParentStrings.fromCsvLine(line);
+        for (Entry<String, PersonWithParentStrings> set : people.entrySet()) {
+          if (set.getKey().equals(new_person.getFullname())) {
+            throw new AmbiguousPersonException(set.getValue(), new_person);
           }
         }
-        people.add(new_person);
+        people.put(new_person.getFullname(), new_person);
       } catch (NegativeLifespanException e) {
         System.err.println(e);
       }
     }
+    PersonWithParentStrings.connectRelatives(people);
     file.close();
-    return people;
+    return PersonWithParentStrings.unpackMap(people);
 
   }
 
   String negativeLifespanExceptionMessage() {
     return String.format("Person '%s %s' has death date %s earlier than birth date %s", this.name, this.surname,
         this.death, this.birthdate);
-  }
-
-  String ambiguousPersonExceptionMessage(Person person) {
-    return String.format("Least two people with names '%s %s' exist",this.name,this.surname);
   }
 
   public String getName() {
@@ -102,10 +109,11 @@ public class Person implements Comparable<Person> {
   }
 
   public String getFullname() {
-    return String.format("%s %s",this.name,this.surname);
+    return String.format("%s %s", this.name, this.surname);
   }
 
   boolean adopt(Person child) {
+    // children are a set, they are already unique :)
     return this.children.add(child);
   }
 
@@ -189,5 +197,21 @@ public class Person implements Comparable<Person> {
     // List<Person> children = new ArrayList<Person>();
     children.sort(Person::compareTo);
     return children;
+  }
+
+  public static void toBinaryFile(String path, List<Person> people) throws IOException, FileNotFoundException {
+    FileOutputStream fos = new FileOutputStream(path);
+    ObjectOutputStream oos = new ObjectOutputStream(fos);
+    oos.writeObject(people);
+    oos.close();
+  }
+
+  public static List<Person> fromBinaryFile(String path) throws IOException, ClassNotFoundException {
+    FileInputStream fis = new FileInputStream(path);
+    ObjectInputStream ois = new ObjectInputStream(fis);
+    @SuppressWarnings("unchecked")
+    List<Person> people = (ArrayList<Person>) ois.readObject();
+    ois.close();
+    return people;
   }
 }

@@ -5,6 +5,6 @@ public class NegativeLifespanException extends Exception {
   //   return "birthdate cannot be later than death";
   // }
   public NegativeLifespanException(Person person) {
-    super(person.negativeLifespanExceptionMessage());
+   super(person.negativeLifespanExceptionMessage());
   }
 }
