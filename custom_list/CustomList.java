@@ -126,7 +126,7 @@ public class CustomList<T> extends AbstractList<T> {
 
       @Override
       public boolean hasNext() {
-        return current.next != null;
+        return current != null;
       }
 
       @Override
