@@ -1,34 +1,38 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PlantUMLRunner {
-  private String jar_path;
+  private static String jarPath;
 
   public static String default_jar_path() {
     return "/usr/share/java/plantuml/plantuml.jar";
   }
 
-  public void setJarPath(String path) {
-    jar_path = path;
+  public static void setJarPath(String path) {
+    jarPath = path;
   }
 
-  public String generateTree(List<Person> people) {
-    Set<Person> objects = new HashSet<>();
-    for (Person person : people) {
-      objects.add(person);
-      objects.addAll(person.getChildren());
+  
+
+   public static void generate(String data, String outputPath, String fileName){
+        File directory = new File(outputPath);
+        directory.mkdirs();
+        File file = new File(outputPath + "/" + fileName);
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(data);
+            writer.close();
+            ProcessBuilder builder = new ProcessBuilder("java", "-jar", jarPath, file.getPath());
+            builder.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-    StringBuffer ret = new StringBuffer();
-    return ret.toString();
-  }
-
-  public void generate(List<Person> people, String output_file) throws IOException {
-    BufferedWriter file = new BufferedWriter(new FileWriter(output_file));
-    file.write(generateTree(people));
-    file.close();
-  }
+  
 }

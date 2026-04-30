@@ -11,13 +11,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Person implements Comparable<Person>, Serializable {
   private final String name;
@@ -213,5 +217,46 @@ public class Person implements Comparable<Person>, Serializable {
     List<Person> people = (ArrayList<Person>) ois.readObject();
     ois.close();
     return people;
+  }
+
+  public static String generateTree(List<Person> people, Function<String,String> func) {
+    Set<Person> objects = new HashSet<>();
+    for (Person person : people) {
+      objects.add(person);
+      objects.addAll(person.getChildren());
+    }
+    String objectString = objects.stream()
+        .map(person -> String.format("\nobject \"%s\"", person.getFullname()))
+        // Bardzo ładny syntax
+        .map(func)
+        .collect(Collectors.joining("\n"));
+
+    String relationsString = objects.stream()
+        .flatMap(parent -> parent.getChildren().stream()
+            .map(child -> String.format("\"%s\" <|-- \"%s\"\n", parent.getFullname(), child.getFullname())))
+        .collect(Collectors.joining("\n"));
+
+    return String.format("@startuml\n%s\n%s\n@enduml", objectString, relationsString);
+  }
+
+  public static List<Person> filterBySubstring(List<Person> people, String substring) {
+    return people.stream().filter(person -> person.getFullname().contains(substring)).toList();
+  }
+
+  public static List<Person> sortByBirthdate(List<Person> people) {
+    // return people.stream().sorted((person1, person2) ->
+    // person1.birthdate.compareTo(person2.birthdate)).toList();
+    // Comparable sortuje po dacie urodzin
+    return people.stream().sorted().toList();
+  }
+
+  public static List<Person> filterToDead(List<Person> people) {
+    return people.stream().filter(person -> person.death != null).sorted((person1, person2) -> (person1.birthdate
+        .until(person1.death).getDays() - person2.birthdate.until(person2.death).getDays())).toList();
+  }
+
+  public static Person findOldest(List<Person> people) {
+    return people.stream().filter(person -> person.death == null).min(Comparator.comparing(person -> person.birthdate))
+        .orElse(null);
   }
 }
