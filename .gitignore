@@ -3,3 +3,4 @@ svg/*.class
 svg_decorator/*.class
 genealogy/*.class
 custom_list/*.class
+*/*.class
